@@ -44,14 +44,17 @@ behalf, because a reset would race a reader that is still draining. Every reader
    read. Whatever is in the ring at that moment was written for an earlier reader or session.
    A slot pushed between the two loads is skipped too, which costs one update at open.
 2. **Drops slots from another recording.** When the reader's session is bound to a recording,
-   it keeps only slots whose `recording_identity_token` is that recording's token. This
-   covers a backlog that outlives the open (a source shared with an earlier session), a writer
-   restart, and a binding change. A reader with no bound recording keeps everything.
+   the reader's consumer keeps only slots whose `recording_identity_token` is that
+   recording's token, derived from the binding's `recording_id` the same way the writer
+   derives it. This covers a backlog that outlives the open (a source shared with an earlier
+   session), a writer restart, and a binding change. A reader with no bound recording keeps
+   everything; a bound session whose binding has no `recording_id` keeps nothing.
 3. **Treats a new `producer_generation` as a new stream.** Frame and sequence counters restart
    with it; a change is not a gap or a regression.
 
-Citrus implements this in `ShamanV2LiveStateReader::Open` and `Arena::AdmitsBoundRecording`
-(Citrus PR #34, 2026-10-13).
+Citrus implements this in `ShamanV2LiveStateReader::Open` (rule 1) and
+`Arena::AdmitsBoundRecording` (rule 2, after the reader has consumed the slot) (Citrus PR #34,
+2026-10-13).
 
 ## Updates per frame
 
@@ -59,7 +62,7 @@ A frame produces up to three updates, all carrying the same `state_stream_frame_
 update when the frame arrives, the detection update, and the pose update. A later update for a
 frame supersedes an earlier one, and the first update of a newer frame supersedes all of them.
 A reader that wants one row per frame keeps the latest update of the current frame and emits it
-when the next frame starts.
+when the next frame starts or when the reader stops.
 
 `detection_status` and `pose_status` say where each stage stands for that frame:
 
