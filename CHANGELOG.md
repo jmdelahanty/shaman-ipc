@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- README: reader rules (discard the backlog at open, drop slots from another recording, new
+  `producer_generation` = new stream) and the per-frame update sequence with the meaning of each
+  `pose_status` value. Documentation only; the layout and `kSchemaVersion` are unchanged.
+
 ## v4.0.0 (2026-10-12)
 
 - Extracted from Orange 52a840e. Layout revision 4 (`kSchemaVersion` 4,
