@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v4.0.1 (2026-10-13)
 
 - README: reader rules (discard the backlog at open, drop slots from another recording, new
   `producer_generation` = new stream) and the per-frame update sequence with the meaning of each
